@@ -11,7 +11,7 @@
     --bg:#0d0f14;--surface:#151820;--surface2:#1c2030;--border:#252a38;
     --accent:#4f9eff;--accent2:#ff6b4a;--text:#e8eaf0;--text2:#7a8099;
     --mattina:#4f9eff;--pomeriggio:#ff6b4a;--riposo:#3a3f52;
-    --rep-mat:#a78bfa;--rep-pom:#fb923c;--festivo:#ffd700;
+    --rep-mat:#a78bfa;--rep-pom:#fb923c;--festivo:#ffd700;--serale:#a78bfa;--spezzato:#facc15;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;}
@@ -29,6 +29,9 @@
   .tab.festivo-tab{color:#b8860b;}
   .tab.festivo-tab.active{background:linear-gradient(135deg,#b8860b,#ffd700);color:#0d0f14;}
   .tab.festivo-tab:hover:not(.active){color:var(--festivo);}
+  .tab.feriali-tab{color:#34d399;}
+  .tab.feriali-tab.active{background:linear-gradient(135deg,#059669,#34d399);color:#0d0f14;}
+  .tab.feriali-tab:hover:not(.active){color:#34d399;}
   .panel{display:none;}.panel.active{display:block;}
 
   /* ── FORMS ── */
@@ -83,6 +86,8 @@
   .shift-riposo .day-shift{background:rgba(58,63,82,.5);color:var(--text2);}
   .shift-rep-mat .day-shift{background:rgba(167,139,250,.15);color:var(--rep-mat);}
   .shift-rep-pom .day-shift{background:rgba(251,146,60,.15);color:var(--rep-pom);}
+  .shift-serale .day-shift{background:rgba(167,139,250,.15);color:var(--serale);}
+  .shift-spezzato .day-shift{background:rgba(250,204,21,.15);color:var(--spezzato);}
 
   /* ── TURNO DETTAGLIO ESPANDIBILE ── */
   .shift-detail{display:none;grid-column:1/-1;margin-top:.4rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.7rem .9rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text2);animation:fadeIn .15s ease;}
@@ -123,6 +128,8 @@
   .shift-item.pomeriggio{background:rgba(255,107,74,.1);border-color:rgba(255,107,74,.2);}
   .shift-item.rep-mat{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.2);}
   .shift-item.rep-pom{background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.2);}
+  .shift-item.serale{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.2);}
+  .shift-item.spezzato{background:rgba(250,204,21,.1);border-color:rgba(250,204,21,.2);}
   .worker-name{display:block;font-size:.72rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .shift-type{display:block;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text2);margin-top:.15rem;}
   /* Dettaglio espandibile nella griglia settimana */
@@ -160,6 +167,8 @@
   .gf-tab.active.pomeriggio{background:var(--pomeriggio);border-color:var(--pomeriggio);color:#fff;}
   .gf-tab.active.rep-mat{background:var(--rep-mat);border-color:var(--rep-mat);color:#fff;}
   .gf-tab.active.rep-pom{background:var(--rep-pom);border-color:var(--rep-pom);color:#fff;}
+  .gf-tab.active.serale{background:var(--serale);border-color:var(--serale);color:#fff;}
+  .gf-tab.active.spezzato{background:var(--spezzato);border-color:var(--spezzato);color:#0d0f14;}
   .gf-tab.active.riposo{background:var(--riposo);border-color:var(--text2);color:var(--text);}
   .giorno-list-header{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;padding:.4rem 1rem;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);margin-bottom:.3rem;}
   .giorno-list{display:grid;gap:.35rem;}
@@ -208,7 +217,8 @@
   .festivo-card-num{font-family:'DM Mono',monospace;font-size:.82rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;min-width:60px;text-align:center;}
   .festivo-card-num.mat{background:rgba(79,158,255,.15);color:var(--mattina);}
   .festivo-card-num.pom{background:rgba(255,107,74,.15);color:var(--pomeriggio);}
-  .festivo-card-num.serale{background:rgba(251,146,60,.15);color:var(--rep-pom);}
+  .festivo-card-num.serale{background:rgba(167,139,250,.15);color:var(--serale);}
+  .festivo-card-num.spezzato{background:rgba(250,204,21,.15);color:var(--spezzato);}
   .festivo-card-info{flex:1;min-width:0;}
   .festivo-card-nome{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .festivo-card-linee{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.25rem;}
@@ -270,6 +280,7 @@
   <div class="tabs">
     <button class="tab active" onclick="switchTab('giorno',this)">📋 Turno del Giorno</button>
     <button class="tab"        onclick="switchTab('cerca',this)">🔍 Cerca</button>
+    <button class="tab feriali-tab" onclick="switchTab('feriali',this)">🚌 Turni Feriali</button>
     <button class="tab festivo-tab" onclick="switchTab('festivi',this)">🌟 Dom/Festivi</button>
   </div>
 
@@ -343,8 +354,10 @@
         <div class="field" style="justify-content:flex-end"><button class="btn" onclick="searchWorker()">Cerca</button></div>
       </div>
       <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--mattina)"></div>Mattina (dispari)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--pomeriggio)"></div>Pomeriggio (pari)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--mattina)"></div>Mattina</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pomeriggio)"></div>Pomeriggio</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--serale)"></div>Serale</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--spezzato)"></div>Spezzato</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--rep-mat)"></div>Rep. Mattina (R1-R3)</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--rep-pom)"></div>Rep. Pom. (R4+)</div>
         <div class="legend-item"><div class="legend-dot" style="background:var(--riposo)"></div>Riposo</div>
@@ -421,6 +434,8 @@
             <option value="">Tutti i turni</option>
             <option value="mattina">🌅 Mattina</option>
             <option value="pomeriggio">🌆 Pomeriggio</option>
+            <option value="serale">🌙 Serale</option>
+            <option value="spezzato">⚡ Spezzato</option>
             <option value="rep-mat">🔶 Rep. Mattina</option>
             <option value="rep-pom">🔷 Rep. Pom.</option>
           </select>
@@ -429,6 +444,53 @@
       </div>
       <div id="r-week"><div class="empty-state"><div class="icon">📅</div><p>Seleziona una data · tocca un turno per i dettagli</p></div></div>
     </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       TAB: TURNI FERIALI
+       ══════════════════════════════════════ -->
+  <div class="panel" id="panel-feriali">
+    <div class="festivi-header-banner" style="background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(5,150,105,.05));border-color:rgba(52,211,153,.25)">
+      <div class="festivi-banner-icon">🚌</div>
+      <div>
+        <div class="festivi-banner-title" style="color:#34d399">Turni Feriali — Deposito Catagnina</div>
+        <div class="festivi-banner-sub">Dal 07/01/2026 · <span id="fer-total-count">—</span> turni attivi · <em>Tocca un turno per i dettagli</em></div>
+      </div>
+      <div class="festivi-stats">
+        <div class="festivi-stat-pill" style="border-color:var(--mattina);color:var(--mattina);background:rgba(79,158,255,.08)">☀️ <strong id="fer-mat-count">—</strong> mat.</div>
+        <div class="festivi-stat-pill" style="border-color:var(--pomeriggio);color:var(--pomeriggio);background:rgba(255,107,74,.08)">🌆 <strong id="fer-pom-count">—</strong> pom.</div>
+        <div class="festivi-stat-pill" style="border-color:var(--serale);color:var(--serale);background:rgba(167,139,250,.08)">🌙 <strong id="fer-ser-count">—</strong> ser.</div>
+        <div class="festivi-stat-pill" style="border-color:var(--spezzato);color:var(--spezzato);background:rgba(250,204,21,.08)">⚡ <strong id="fer-spe-count">—</strong> spe.</div>
+      </div>
+    </div>
+    <div class="festivi-search">
+      <div class="field"><label>Linea</label><input type="text" id="fv2-linea" placeholder="es. 52" oninput="renderFeriali()" style="min-width:100px"/></div>
+      <div class="field"><label>Inizio da</label><input type="time" id="fv2-inizio" oninput="renderFeriali()" style="min-width:120px"/></div>
+      <div class="field"><label>Fine entro</label><input type="time" id="fv2-fine" oninput="renderFeriali()" style="min-width:120px"/></div>
+      <div class="field">
+        <label>Tipologia</label>
+        <select id="fv2-tipo" onchange="renderFeriali()" style="min-width:150px">
+          <option value="">Tutte</option>
+          <option>CTT_UM</option><option>CTT_EP</option><option>CTT_EM</option><option>CTT_OU</option>
+          <option>MS_UNm</option><option>MS_UNp</option><option>MS_UNmp</option>
+          <option>MS_UUm</option><option>MS_UUp</option><option>MS_UUs</option>
+          <option>AT_UFT</option><option>AT_Nast</option>
+        </select>
+      </div>
+      <div class="field" style="justify-content:flex-end">
+        <button class="btn" style="background:linear-gradient(135deg,#059669,#34d399);color:#0d0f14" onclick="resetFerialiFilters()">🔄 Reset</button>
+      </div>
+    </div>
+    <div class="festivi-filters">
+      <span class="festivi-filter-label">Mostra:</span>
+      <button class="ff-btn active-all" id="ffbtn2-all"     onclick="setFerialiFilter('all')">Tutti</button>
+      <button class="ff-btn"            id="ffbtn2-mat"     onclick="setFerialiFilter('mat')">☀️ Mattinali</button>
+      <button class="ff-btn"            id="ffbtn2-pom"     onclick="setFerialiFilter('pom')">🌆 Pomeridiani</button>
+      <button class="ff-btn"            id="ffbtn2-serale"  onclick="setFerialiFilter('serale')">🌙 Serali</button>
+      <button class="ff-btn"            id="ffbtn2-spezzato" onclick="setFerialiFilter('spezzato')">⚡ Spezzati</button>
+    </div>
+    <div id="r-feriali"></div>
   </div>
 
   <!-- ══════════════════════════════════════
@@ -813,8 +875,28 @@ function parseLocalDate(str){if(!str)return new Date();const[y,m,d]=str.split('-
 function getMonday(d){const date=d instanceof Date?new Date(d):parseLocalDate(d);date.setHours(0,0,0,0);const day=date.getDay();date.setDate(date.getDate()+(day===0?-6:1-day));return date;}
 function weekOffset(m){return Math.round((m-START_MONDAY)/(7*24*60*60*1000));}
 function getRow(g,pos,wo){const rot=ROTATIONS[g];const idx=((pos-1)+wo)%rot.length;return rot[(idx+rot.length)%rot.length];}
-function shiftClass(v){if(!v||v==='RIP')return'riposo';const s=String(v);if(s.startsWith('R')){const n=parseInt(s.slice(1));return n<=3?'rep-mat':'rep-pom';}return parseInt(s)%2===0?'pomeriggio':'mattina';}
-function shiftLabel(v){if(!v||v==='RIP')return'Riposo';const s=String(v);if(s.startsWith('R')){const n=parseInt(s.slice(1));return n<=3?'Rep. Mattina':'Rep. Pom.';}return parseInt(s)%2===0?'Pomeriggio':'Mattina';}
+function shiftClass(v){
+  if(!v||v==='RIP')return'riposo';
+  const s=String(v);
+  if(s.startsWith('R')){const n=parseInt(s.slice(1));return n<=3?'rep-mat':'rep-pom';}
+  const t=TURNI_SERVIZIO.find(x=>x.num==='MS'+s.padStart(3,'0'));
+  if(t){
+    const ini=toMin(t.inizio),fin=toMin(t.fine);
+    if(ini>=toMin('16:00'))return'serale';
+    if(ini>=toMin('04:00')&&ini<=toMin('12:00')&&fin>toMin('15:00'))return'spezzato';
+    if(ini>toMin('12:00')&&fin<=toMin('21:30'))return'pomeriggio';
+    if(ini>=toMin('04:00')&&fin<=toMin('15:00'))return'mattina';
+    return'riposo';
+  }
+  return parseInt(s)%2===0?'pomeriggio':'mattina';
+}
+function shiftLabel(v){
+  if(!v||v==='RIP')return'Riposo';
+  const s=String(v);
+  if(s.startsWith('R')){const n=parseInt(s.slice(1));return n<=3?'Rep. Mattina':'Rep. Pom.';}
+  const cls=shiftClass(v);
+  return{mattina:'Mattina',pomeriggio:'Pomeriggio',serale:'Serale',spezzato:'Spezzato',riposo:'Riposo','rep-mat':'Rep. Mattina','rep-pom':'Rep. Pom.'}[cls]||'Mattina';
+}
 function getTurnoData(v){
   if(!v||v==='RIP'||String(v).startsWith('R'))return null;
   const key='MS'+String(v).padStart(3,'0');
@@ -866,6 +948,7 @@ function switchTab(id,el){
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
   if(id==='festivi')renderFestivi();
+  if(id==='feriali')renderFeriali();
 }
 function switchSub(id,el){
   document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
@@ -960,7 +1043,7 @@ function searchTurnoNum(){
   const cls=shiftClass(turnoNum);
   const lbl=shiftLabel(turnoNum);
   const td=getTurnoData(turnoNum);
-  const pillColors={mattina:{bg:'rgba(79,158,255,.15)',color:'var(--mattina)'},pomeriggio:{bg:'rgba(255,107,74,.15)',color:'var(--pomeriggio)'},'rep-mat':{bg:'rgba(167,139,250,.15)',color:'var(--rep-mat)'},'rep-pom':{bg:'rgba(251,146,60,.15)',color:'var(--rep-pom)'},riposo:{bg:'rgba(58,63,82,.4)',color:'var(--text2)'}};
+  const pillColors={mattina:{bg:'rgba(79,158,255,.15)',color:'var(--mattina)'},pomeriggio:{bg:'rgba(255,107,74,.15)',color:'var(--pomeriggio)'},serale:{bg:'rgba(167,139,250,.15)',color:'var(--serale)'},spezzato:{bg:'rgba(250,204,21,.15)',color:'var(--spezzato)'},'rep-mat':{bg:'rgba(167,139,250,.15)',color:'var(--rep-mat)'},'rep-pom':{bg:'rgba(251,146,60,.15)',color:'var(--rep-pom)'},riposo:{bg:'rgba(58,63,82,.4)',color:'var(--text2)'}};
   const pc=pillColors[cls]||pillColors.riposo;
   // Header con dettaglio servizio integrato
   let html=`<div class="result-section">`;
@@ -1121,8 +1204,8 @@ function showGiornoView(filterOverride){
   const activeFilter=filterOverride||_giornoFilter;_giornoFilter=activeFilter;
   const filtered=activeFilter==='all'?all:all.filter(w=>w.cls===activeFilter);
   const isToday=date.toDateString()===new Date().toDateString();
-  const pillColors={mattina:{bg:'rgba(79,158,255,.15)',color:'var(--mattina)'},pomeriggio:{bg:'rgba(255,107,74,.15)',color:'var(--pomeriggio)'},'rep-mat':{bg:'rgba(167,139,250,.15)',color:'var(--rep-mat)'},'rep-pom':{bg:'rgba(251,146,60,.15)',color:'var(--rep-pom)'},riposo:{bg:'rgba(58,63,82,.4)',color:'var(--text2)'}};
-  const filterLabels={all:`Tutti (${all.length})`,mattina:`🌅 Mattina (${counts.mattina})`,pomeriggio:`🌆 Pomeriggio (${counts.pomeriggio})`,'rep-mat':`🔶 Rep. Mat. (${counts['rep-mat']})`,'rep-pom':`🔷 Rep. Pom. (${counts['rep-pom']})`,riposo:`💤 Riposo (${counts.riposo})`};
+  const pillColors={mattina:{bg:'rgba(79,158,255,.15)',color:'var(--mattina)'},pomeriggio:{bg:'rgba(255,107,74,.15)',color:'var(--pomeriggio)'},serale:{bg:'rgba(167,139,250,.15)',color:'var(--serale)'},spezzato:{bg:'rgba(250,204,21,.15)',color:'var(--spezzato)'},'rep-mat':{bg:'rgba(167,139,250,.15)',color:'var(--rep-mat)'},'rep-pom':{bg:'rgba(251,146,60,.15)',color:'var(--rep-pom)'},riposo:{bg:'rgba(58,63,82,.4)',color:'var(--text2)'}};
+  const filterLabels={all:`Tutti (${all.length})`,mattina:`🌅 Mattina (${counts.mattina||0})`,pomeriggio:`🌆 Pomeriggio (${counts.pomeriggio||0})`,serale:`🌙 Serale (${counts.serale||0})`,spezzato:`⚡ Spezzato (${counts.spezzato||0})`,'rep-mat':`🔶 Rep. Mat. (${counts['rep-mat']||0})`,'rep-pom':`🔷 Rep. Pom. (${counts['rep-pom']||0})`,riposo:`💤 Riposo (${counts.riposo||0})`};
   let html=`<div class="result-section">`;
   html+=`<div class="giorno-header"><div class="giorno-date-badge"><div class="gdb-day">${date.toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})}${isToday?' <span class="current-badge">OGGI</span>':''}</div><div class="gdb-label">${DAY_NAMES_FULL[dayIdx]}</div></div><div class="giorno-totals">`;
   Object.entries(pillColors).forEach(([k,v])=>{if(!counts[k])return;const l={mattina:'Mattina',pomeriggio:'Pomeriggio','rep-mat':'Rep.Mat.','rep-pom':'Rep.Pom.',riposo:'Riposo'};html+=`<div class="giorno-pill" style="background:${v.bg};color:${v.color};border-color:${v.color}">${l[k]}: <strong>${counts[k]}</strong></div>`;});
@@ -1319,6 +1402,114 @@ function toggleFestivoDetail(detId,cardEl){
   if(!det)return;
   det.classList.toggle('open');
   cardEl.classList.toggle('expanded');
+}
+
+
+/* ══════════════════════════════════════════════
+   TURNI FERIALI
+══════════════════════════════════════════════ */
+let _ferialiFilter='all';
+
+function setFerialiFilter(f){
+  _ferialiFilter=f;
+  ['all','mat','pom','serale','spezzato'].forEach(k=>{
+    const btn=document.getElementById('ffbtn2-'+k);
+    btn.className='ff-btn'+(f===k?' active-'+k:'');
+  });
+  renderFeriali();
+}
+
+function resetFerialiFilters(){
+  ['fv2-linea','fv2-inizio','fv2-fine'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fv2-tipo').value='';
+  _ferialiFilter='all';
+  setFerialiFilter('all');
+}
+
+function ferialeCat(t){
+  const ini=toMin(t.inizio),fin=toMin(t.fine);
+  if(ini>=toMin('16:00'))return'serale';
+  if(ini>=toMin('04:00')&&ini<=toMin('12:00')&&fin>toMin('15:00'))return'spezzato';
+  if(ini>toMin('12:00')&&fin<=toMin('21:30'))return'pom';
+  if(ini>=toMin('04:00')&&fin<=toMin('15:00'))return'mat';
+  return'mat';
+}
+
+function renderFeriali(){
+  const lineaRaw=document.getElementById('fv2-linea').value.trim().toUpperCase();
+  const linea=lineaRaw?(lineaRaw.startsWith('L')?lineaRaw:'L'+lineaRaw):'';
+  const iniMin=document.getElementById('fv2-inizio').value;
+  const fineMax=document.getElementById('fv2-fine').value;
+  const tipoFlt=document.getElementById('fv2-tipo').value;
+
+  let pool=[...TURNI_SERVIZIO];
+  if(linea) pool=pool.filter(t=>t.linee.includes(linea));
+  if(iniMin) pool=pool.filter(t=>toMin(t.inizio)>=toMin(iniMin));
+  if(fineMax) pool=pool.filter(t=>toMin(t.fine)<=toMin(fineMax));
+  if(tipoFlt) pool=pool.filter(t=>t.tipo===tipoFlt);
+  if(_ferialiFilter!=='all') pool=pool.filter(t=>ferialeCat(t)===_ferialiFilter);
+
+  const allMat=TURNI_SERVIZIO.filter(t=>ferialeCat(t)==='mat').length;
+  const allPom=TURNI_SERVIZIO.filter(t=>ferialeCat(t)==='pom').length;
+  const allSer=TURNI_SERVIZIO.filter(t=>ferialeCat(t)==='serale').length;
+  const allSpe=TURNI_SERVIZIO.filter(t=>ferialeCat(t)==='spezzato').length;
+  document.getElementById('fer-mat-count').textContent=allMat;
+  document.getElementById('fer-pom-count').textContent=allPom;
+  document.getElementById('fer-ser-count').textContent=allSer;
+  document.getElementById('fer-spe-count').textContent=allSpe;
+  document.getElementById('fer-total-count').textContent=TURNI_SERVIZIO.length;
+
+  if(pool.length===0){
+    document.getElementById('r-feriali').innerHTML=`<div class="empty-state" style="padding:3rem"><div class="icon">🔍</div><p>Nessun turno trovato</p></div>`;
+    return;
+  }
+
+  function ferCardHtml(t,idx){
+    const cat=ferialeCat(t);
+    const numCls=cat==='mat'?'mat':cat==='pom'?'pom':cat==='serale'?'serale':'spezzato';
+    const col=TIPO_COLOR[t.tipo]||'#7a8099';
+    const detId=`fer-${idx}`;
+    return `<div class="festivo-card" onclick="toggleFestivoDetail('${detId}',this)">
+      <div class="festivo-card-num ${numCls}">${t.num}</div>
+      <div class="festivo-card-info">
+        <div class="festivo-card-nome">${t.desc.split(',')[0]}</div>
+        <div class="festivo-card-linee">${t.linee.map(l=>`<span class="festivo-linea-tag">${l}</span>`).join('')}</div>
+      </div>
+      <div class="festivo-card-orari">
+        <div class="festivo-card-time">${t.inizio} → ${t.fine}</div>
+        <div class="festivo-card-tipo" style="color:${col}">${t.tipo}</div>
+      </div>
+      <div class="festivo-card-detail" id="${detId}">
+        <strong style="color:var(--text)">${t.num}</strong> &nbsp;·&nbsp; ${t.inizio} → ${t.fine} &nbsp;·&nbsp;
+        <span style="color:${col}">${t.tipo}</span><br>
+        <div style="margin-top:.3rem">${t.desc}</div>
+        <div style="margin-top:.3rem;display:flex;gap:.3rem;flex-wrap:wrap">${t.linee.map(l=>`<span class="festivo-linea-tag">${l}</span>`).join('')}</div>
+        ${t.note?`<div style="margin-top:.3rem;opacity:.7">${t.note}</div>`:''}
+      </div>
+    </div>`;
+  }
+
+  const hasExtraFilters=linea||iniMin||fineMax||tipoFlt;
+  if(_ferialiFilter==='all' && !hasExtraFilters){
+    const mat=pool.filter(t=>ferialeCat(t)==='mat').sort((a,b)=>toMin(a.inizio)-toMin(b.inizio));
+    const pom=pool.filter(t=>ferialeCat(t)==='pom').sort((a,b)=>toMin(a.inizio)-toMin(b.inizio));
+    const ser=pool.filter(t=>ferialeCat(t)==='serale').sort((a,b)=>toMin(a.inizio)-toMin(b.inizio));
+    const spe=pool.filter(t=>ferialeCat(t)==='spezzato').sort((a,b)=>toMin(a.inizio)-toMin(b.inizio));
+    let gi=0;
+    let html=`<div class="result-section"><div class="festivi-split">`;
+    html+=`<div><div class="festivi-col-header mat-hdr">☀️ Mattinali <span style="font-size:.7rem;opacity:.7">(${mat.length})</span></div><div class="festivi-col-body">${mat.map(t=>ferCardHtml(t,gi++)).join('')}</div></div>`;
+    html+=`<div><div class="festivi-col-header pom-hdr">🌆 Pomeridiani <span style="font-size:.7rem;opacity:.7">(${pom.length})</span></div><div class="festivi-col-body">${pom.map(t=>ferCardHtml(t,gi++)).join('')}</div></div>`;
+    html+=`</div>`;
+    if(ser.length>0){html+=`<div class="festivi-serale-section"><div class="festivi-serale-header" style="background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2);color:var(--serale)">🌙 Serali <span style="font-size:.7rem;opacity:.7">(${ser.length})</span></div><div class="festivi-serale-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">${ser.map(t=>ferCardHtml(t,gi++)).join('')}</div></div>`;}
+    if(spe.length>0){html+=`<div class="festivi-serale-section" style="margin-top:.7rem"><div class="festivi-serale-header" style="background:rgba(250,204,21,.08);border-color:rgba(250,204,21,.2);color:var(--spezzato)">⚡ Spezzati <span style="font-size:.7rem;opacity:.7">(${spe.length})</span></div><div class="festivi-serale-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">${spe.map(t=>ferCardHtml(t,gi++)).join('')}</div></div>`;}
+    html+=`</div>`;
+    document.getElementById('r-feriali').innerHTML=html;
+  } else {
+    pool.sort((a,b)=>toMin(a.inizio)-toMin(b.inizio));
+    const catLabels={mat:'☀️ Mattinali',pom:'🌆 Pomeridiani'};
+    const hdr=_ferialiFilter!=='all'?`${catLabels[_ferialiFilter]} — <strong style="color:var(--text)">${pool.length}</strong> turni`:`<strong style="color:var(--text)">${pool.length}</strong> turni trovati`;
+    document.getElementById('r-feriali').innerHTML=`<div class="result-section"><div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text2);margin-bottom:.8rem">${hdr}</div><div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">${pool.map((t,i)=>ferCardHtml(t,i)).join('')}</div></div>`;
+  }
 }
 
 /* ══════════════════════════════════════════════
