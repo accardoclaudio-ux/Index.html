@@ -1255,7 +1255,7 @@ function loadGiornalieroXLS(input){
   reader.onload=function(e){
     try{
       if(typeof XLSX==='undefined'){alert('Libreria XLSX non caricata');return;}
-      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
       const ws=wb.Sheets[wb.SheetNames[0]];
       const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
       const assignments={};
@@ -1283,6 +1283,7 @@ function loadGiornalieroXLS(input){
           assignments[nome]=turnos;
         });
       }
+      }  // fine for
       let dataStr=null;
       const dm=file.name.match(/(\d{2})-(\d{2})-(\d{4})/);
       if(dm)dataStr=`${dm[3]}-${dm[2]}-${dm[1]}`;
@@ -1294,7 +1295,7 @@ function loadGiornalieroXLS(input){
       if(dataStr){document.getElementById('g-date').value=dataStr;showGiornoView();}
     }catch(err){document.getElementById('xls-status').textContent='⚠️ Errore: '+err.message;}
   };
-  reader.readAsBinaryString(file);
+  reader.readAsArrayBuffer(file);
 }
 
 function showGiornoView(filterOverride){
