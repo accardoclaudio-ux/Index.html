@@ -1262,14 +1262,26 @@ function loadGiornalieroXLS(input){
       const turnoRe=/^(MS\d+|DISP[MP]|RMS\d+|O-MS\d+)$/i;
       for(const row of rows){
         const cells=row.map(c=>String(c||'').trim());
-        let nomeCompleto=null;
-        for(const cell of cells){
-          const clean=cell.replace(/\.0$/,'');
-          if(/^\d{3,6}$/.test(clean)&&MATRICOLE[clean]){nomeCompleto=MATRICOLE[clean];break;}
+      // Trova TUTTE le matricole nella riga (possono essere 2 lavoratori)
+      const matricoleTrovate=[];
+      cells.forEach((cell,idx)=>{
+        const clean=cell.replace(/\.0$/,'');
+        if(/^\d{3,6}$/.test(clean)&&MATRICOLE[clean]){
+          matricoleTrovate.push({nome:MATRICOLE[clean],idx});
         }
-        if(!nomeCompleto)continue;
+      });
+      if(matricoleTrovate.length===0)continue;
+      if(matricoleTrovate.length===1){
         const turnos=cells.filter(c=>turnoRe.test(c.trim())).map(c=>c.trim().toUpperCase());
-        assignments[nomeCompleto]=turnos;
+        assignments[matricoleTrovate[0].nome]=turnos;
+      } else {
+        // Due lavoratori: dividi le celle a metà per separare i turni
+        const mid=Math.floor(cells.length/2);
+        matricoleTrovate.forEach(({nome,idx})=>{
+          const half=idx<mid?cells.slice(0,mid):cells.slice(mid);
+          const turnos=half.filter(c=>turnoRe.test(c.trim())).map(c=>c.trim().toUpperCase());
+          assignments[nome]=turnos;
+        });
       }
       let dataStr=null;
       const dm=file.name.match(/(\d{2})-(\d{2})-(\d{4})/);
